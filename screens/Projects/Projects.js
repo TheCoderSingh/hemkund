@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import background from "../../assets/background.jpg";
 import Project from "./Project";
+import Footer from "../../Footer/Footer";
 
 const Projects = () => {
 	return (
@@ -32,6 +33,7 @@ const Projects = () => {
 					<Project />
 				</ScrollView>
 			</ImageBackground>
+			<Footer />
 		</View>
 	);
 };
