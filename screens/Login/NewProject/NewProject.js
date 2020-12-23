@@ -20,6 +20,9 @@ const NewProject = () => {
 
 	return (
 		<View style={styles.container}>
+			<View style={styles.crossContainer}>
+				<Image source={cross} style={styles.cross} />
+			</View>
 			<View style={styles.topArea}>
 				<Image source={plus} style={styles.plus} />
 				<Text style={styles.title}>New Project</Text>
@@ -59,9 +62,15 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 		justifyContent: "center",
 	},
+	crossContainer: {
+		position: "absolute",
+		top: 50,
+		right: 15,
+	},
 	cross: {
-		width: 80,
-		height: 80,
+		width: 30,
+		height: 30,
+		alignSelf: "flex-end",
 	},
 	topArea: {
 		alignItems: "center",
