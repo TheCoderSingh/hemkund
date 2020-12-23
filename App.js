@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet, View } from "react-native";
-import NewProject from "./screens/Login/NewProject/NewProject";
+import NewProject from "./screens/NewProject/NewProject";
 // import Login from "./screens/Login/Login";
 import Projects from "./screens/Projects/Projects";
 

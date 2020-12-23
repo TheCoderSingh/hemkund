@@ -8,8 +8,8 @@ import {
 	View,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import plus from "../../../assets/plus.png";
-import cross from "../../../assets/cross.png";
+import plus from "../../assets/plus.png";
+import cross from "../../assets/cross.png";
 
 const NewProject = () => {
 	const [project, setProject] = useState();
