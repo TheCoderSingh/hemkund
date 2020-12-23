@@ -8,7 +8,7 @@ import {
 	View,
 } from "react-native";
 import background from "../../assets/background.jpg";
-import Project from "./Project";
+import Project from "../../components/Project";
 import Footer from "../../Footer/Footer";
 
 const Projects = () => {

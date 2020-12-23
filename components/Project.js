@@ -7,7 +7,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import trash from "../../assets/trash.png";
+import trash from "../assets/trash.png";
 
 const Project = () => {
 	return (
