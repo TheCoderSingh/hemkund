@@ -7,6 +7,7 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
+import { Link } from "react-router-native";
 import background from "../../assets/background.jpg";
 import Project from "../../components/Project";
 import Footer from "../../Footer/Footer";
@@ -16,7 +17,9 @@ const Projects = () => {
 		<View style={styles.container}>
 			<ImageBackground source={background} style={styles.background}>
 				<TouchableOpacity style={styles.button}>
-					<Text style={styles.buttonText}>New Project</Text>
+					<Link to="/new-project">
+						<Text style={styles.buttonText}>New Project</Text>
+					</Link>
 				</TouchableOpacity>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
