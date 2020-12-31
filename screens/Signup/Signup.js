@@ -11,8 +11,11 @@ import {
 	KeyboardAvoidingView,
 	TouchableWithoutFeedback,
 } from "react-native";
+import axios from "axios";
+
 import background from "../../assets/background.jpg";
 import logo from "../../assets/logo-green.png";
+import { Link, Redirect } from "react-router-native";
 
 const Signup = () => {
 	const [firstName, setFirstName] = useState();
@@ -22,37 +25,47 @@ const Signup = () => {
 	const [confirmPassword, setConfirmPassword] = useState();
 
 	const handleFirstName = (fname) => {
-		console.log(fname);
 		setFirstName(fname);
 	};
 
 	const handleLastName = (lname) => {
-		console.log(lname);
 		setLastName(lname);
 	};
 
 	const handleEmail = (emailAdd) => {
-		console.log(emailAdd);
 		setEmail(emailAdd);
 	};
 
 	const handlePassword = (pass) => {
-		console.log(pass);
 		setPassword(pass);
 	};
 
 	const handleConfirmPassword = (cPass) => {
-		console.log(cPass);
 		setConfirmPassword(cPass);
 	};
 
 	const register = (fname, lname, emailAdd, pass, cPass) => {
-		console.log("Inside register function...");
-		console.log(fname);
-		console.log(lname);
-		console.log(emailAdd);
-		console.log(pass);
-		console.log(cPass);
+		let user = {
+			fname: fname,
+			lname: lname,
+			email: emailAdd,
+			password: pass,
+			cPass: cPass,
+		};
+
+		axios({
+			method: "post",
+			url: "http://10.0.0.33:8080/create-user",
+			headers: { "Content-Type": "application/json" },
+			data: user,
+			body: JSON.stringify(user),
+		})
+			.then((response) => {
+				console.log(response);
+			})
+			.catch(function (response) {
+				console.log(response);
+			});
 	};
 
 	return (
@@ -63,7 +76,6 @@ const Signup = () => {
 						<Image source={logo} style={styles.logo} />
 						<TextInput
 							placeholder="First Name"
-							secureTextEntry
 							textContentType="givenName"
 							autoCompleteType="name"
 							placeholderTextColor="grey"
@@ -72,7 +84,6 @@ const Signup = () => {
 						/>
 						<TextInput
 							placeholder="Last Name"
-							secureTextEntry
 							textContentType="familyName"
 							autoCompleteType="name"
 							placeholderTextColor="grey"
