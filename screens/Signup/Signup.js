@@ -15,7 +15,6 @@ import axios from "axios";
 
 import background from "../../assets/background.jpg";
 import logo from "../../assets/logo-green.png";
-import { Link, Redirect } from "react-router-native";
 
 const Signup = () => {
 	const [firstName, setFirstName] = useState();
