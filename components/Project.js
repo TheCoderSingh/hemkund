@@ -43,19 +43,19 @@ const Project = (props) => {
 				<Image source={trash} style={styles.icon} />
 			</View>
 			<View style={styles.buttons}>
-				<TouchableOpacity style={styles.button}>
+				{/* <TouchableOpacity style={styles.button}>
 					<Text style={styles.buttonText}>New Plan</Text>
 				</TouchableOpacity>
 				<TouchableOpacity style={{ ...styles.button, marginLeft: 10 }}>
 					<Text style={styles.buttonText}>New Task</Text>
-				</TouchableOpacity>
+				</TouchableOpacity> */}
 			</View>
 			<View style={styles.seperator} />
 			<View style={styles.bottomArea}>
-				<TouchableOpacity style={styles.archiveBtn}>
+				{/* <TouchableOpacity style={styles.archiveBtn}>
 					<Text>Archive</Text>
-				</TouchableOpacity>
-				<Text style={styles.date}>{projectDate}</Text>
+				</TouchableOpacity> */}
+				<Text style={styles.date}>Created on {projectDate}</Text>
 			</View>
 		</TouchableOpacity>
 	);
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
 	card: {
 		backgroundColor: "#EFEFEF",
 		width: 320,
-		height: 115,
+		height: 85,
 		borderRadius: 6,
 		marginTop: 20,
 	},
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
 	},
 	projectTitle: {
 		color: "#03989E",
-		fontSize: 18,
+		fontSize: 20,
 		marginTop: 10,
 	},
 	icon: {
