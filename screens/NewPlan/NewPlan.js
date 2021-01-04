@@ -11,11 +11,11 @@ import { Picker } from "@react-native-picker/picker";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { Link, Redirect } from "react-router-native";
+import { getDocumentAsync } from "expo-document-picker";
 import plus from "../../assets/plus.png";
 import cross from "../../assets/cross.png";
 
 const NewPlan = (props) => {
-	console.log(props);
 	const [planName, setPlanName] = useState();
 	const [categoryName, setCategoryName] = useState();
 	const [isPlanCreated, setIsPlanCreated] = useState(false);
@@ -79,7 +79,17 @@ const NewPlan = (props) => {
 					placeholderTextColor="#fff"
 					onChangeText={handlePlanCategory}
 				/> */}
-				<Text style={styles.cloneText}>Plan Category</Text>
+				{/* <Text style={styles.cloneText}>Plan Category</Text> */}
+				<TouchableOpacity
+					style={styles.button}
+					onPress={() => {
+						getDocumentAsync().then((response) => {
+							console.log(response);
+						});
+					}}
+				>
+					<Text style={styles.buttonText}>Upload Plan</Text>
+				</TouchableOpacity>
 			</View>
 			{/* <Picker
 				selectedValue={project}
@@ -159,6 +169,21 @@ const styles = StyleSheet.create({
 		paddingTop: 13,
 		fontSize: 18,
 		color: "#03989E",
+	},
+	button: {
+		alignSelf: "center",
+		marginTop: 80,
+		backgroundColor: "#fff",
+		borderRadius: 6,
+		height: 45,
+		width: 255,
+		marginBottom: 20,
+	},
+	buttonText: {
+		color: "#03989E",
+		textAlign: "center",
+		paddingTop: 10,
+		fontSize: 18,
 	},
 });
 
