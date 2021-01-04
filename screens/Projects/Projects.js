@@ -1,18 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ImageBackground,
 	ScrollView,
 	StyleSheet,
 	Text,
-	TouchableOpacity,
 	View,
 } from "react-native";
 import { Link } from "react-router-native";
+import firebase from "firebase/app";
 import background from "../../assets/background.jpg";
 import Project from "../../components/Project";
 import Footer from "../../Footer/Footer";
 
 const Projects = () => {
+	const [projects, setProjects] = useState([]);
+
+	useEffect(() => {
+		let projectsRef = firebase.database().ref("projects");
+
+		projectsRef.on(
+			"value",
+			(snapshot) => {
+				snapshot.forEach((project) => {
+					setProjects((projects) => [
+						...projects,
+						project.val().project_id,
+					]);
+				});
+			},
+			(error) => {
+				console.log("Error: " + error.code);
+			}
+		);
+	}, []);
+
 	return (
 		<View style={styles.container}>
 			<ImageBackground source={background} style={styles.background}>
@@ -23,7 +44,9 @@ const Projects = () => {
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{ paddingBottom: 40 }}
 				>
-					<Project />
+					{projects.map((projectId) => {
+						return <Project id={projectId} key={projectId} />;
+					})}
 				</ScrollView>
 			</ImageBackground>
 			<Footer />

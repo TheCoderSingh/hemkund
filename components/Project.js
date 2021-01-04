@@ -1,19 +1,34 @@
-import React from "react";
-import {
-	Button,
-	Image,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import firebase from "firebase/app";
 import trash from "../assets/trash.png";
 
-const Project = () => {
+const Project = (props) => {
+	const [projectName, setProjectName] = useState();
+	const [projectDate, setProjectDate] = useState();
+
+	useEffect(() => {
+		let projectsRef = firebase.database().ref("projects");
+
+		projectsRef
+			.orderByChild("project_id")
+			.equalTo(props.id)
+			.on(
+				"child_added",
+				(data) => {
+					setProjectName(data.val().project_name);
+					setProjectDate(data.val().created_on);
+				},
+				(error) => {
+					console.log("Error: " + error.code);
+				}
+			);
+	}, []);
+
 	return (
-		<View style={styles.card}>
+		<TouchableOpacity style={styles.card}>
 			<View style={styles.topArea}>
-				<Text style={styles.projectTitle}>Camrose Checkpoint</Text>
+				<Text style={styles.projectTitle}>{projectName}</Text>
 				<Image source={trash} style={styles.icon} />
 			</View>
 			<View style={styles.buttons}>
@@ -29,9 +44,9 @@ const Project = () => {
 				<TouchableOpacity style={styles.archiveBtn}>
 					<Text>Archive</Text>
 				</TouchableOpacity>
-				<Text style={styles.date}>December 18, 2020</Text>
+				<Text style={styles.date}>{projectDate}</Text>
 			</View>
-		</View>
+		</TouchableOpacity>
 	);
 };
 
