@@ -1,6 +1,5 @@
 import React from "react";
 import {
-	TouchableOpacity,
 	Image,
 	ImageBackground,
 	StyleSheet,
@@ -8,6 +7,7 @@ import {
 	TextInput,
 	View,
 } from "react-native";
+import { Link } from "react-router-native";
 import background from "../../assets/background.jpg";
 import logo from "../../assets/logo-green.png";
 
@@ -35,12 +35,12 @@ const Login = () => {
 					/>
 				</View>
 				<View style={styles.buttons}>
-					<TouchableOpacity style={styles.button}>
+					<Link to="/login" style={styles.button}>
 						<Text style={styles.buttonText}>Login</Text>
-					</TouchableOpacity>
-					<TouchableOpacity style={styles.button}>
+					</Link>
+					<Link to="/signup" style={styles.button}>
 						<Text style={styles.buttonText}>Sign Up</Text>
-					</TouchableOpacity>
+					</Link>
 				</View>
 			</ImageBackground>
 		</View>

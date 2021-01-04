@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
 	TouchableOpacity,
 	Image,
@@ -11,10 +11,14 @@ import {
 	KeyboardAvoidingView,
 	TouchableWithoutFeedback,
 } from "react-native";
-import axios from "axios";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
 
 import background from "../../assets/background.jpg";
 import logo from "../../assets/logo-green.png";
+import back from "../../assets/back.png";
+import { Link, Redirect } from "react-router-native";
 
 const Signup = () => {
 	const [firstName, setFirstName] = useState();
@@ -22,6 +26,16 @@ const Signup = () => {
 	const [email, setEmail] = useState();
 	const [password, setPassword] = useState();
 	const [confirmPassword, setConfirmPassword] = useState();
+	const [registered, setRegistered] = useState();
+	const [isFNameValid, setIsFNameValid] = useState(true);
+	const [isLNameValid, setIsLNameValid] = useState(true);
+	const [isEmailValid, setIsEmailValid] = useState(true);
+	const [isPasswordValid, setIsPasswordValid] = useState(true);
+	const [isCPasswordValid, setIsCPasswordValid] = useState(true);
+
+	const nameRegex = /^(?=.{1,50}$)[a-z]+(?:['_.\s][a-z]+)*$/i;
+	const emailRegex = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).*$/;
 
 	const handleFirstName = (fname) => {
 		setFirstName(fname);
@@ -43,34 +57,58 @@ const Signup = () => {
 		setConfirmPassword(cPass);
 	};
 
-	const register = (fname, lname, emailAdd, pass, cPass) => {
-		let user = {
-			fname: fname,
-			lname: lname,
-			email: emailAdd,
-			password: pass,
-			cPass: cPass,
-		};
+	const validate = () => {
+		if (firstName && nameRegex.test(firstName)) {
+			setIsFNameValid(true);
+			if (lastName && nameRegex.test(lastName)) {
+				setIsLNameValid(true);
+				if (email && emailRegex.test(email)) {
+					setIsEmailValid(true);
+					if (password && passwordRegex.test(password)) {
+						setIsPasswordValid(true);
+						if (confirmPassword === password) {
+							setIsCPasswordValid(true);
+							register();
+						} else setIsCPasswordValid(false);
+					} else setIsPasswordValid(false);
+				} else setIsEmailValid(false);
+			} else setIsLNameValid(false);
+		} else return setIsFNameValid(false);
+	};
 
-		axios({
-			method: "post",
-			url: "http://10.0.0.33:8080/create-user",
-			headers: { "Content-Type": "application/json" },
-			data: user,
-			body: JSON.stringify(user),
-		})
-			.then((response) => {
-				console.log(response);
+	const register = () => {
+		firebase
+			.auth()
+			.createUserWithEmailAndPassword(email, password)
+			.then(() => {
+				let usersRef = firebase.database().ref().child("users");
+
+				let newUserRef = usersRef.push();
+				newUserRef.set({
+					first_name: firstName,
+					last_name: lastName,
+					email: email,
+					status: "active",
+					registered_on: new Date().toLocaleString(),
+				});
 			})
-			.catch(function (response) {
-				console.log(response);
+			.then(() => {
+				setRegistered(1);
+			})
+			.catch((error) => {
+				console.error(error.code + ": " + error.message);
 			});
 	};
 
-	return (
+	return registered ? (
+		<Redirect to="/projects" />
+	) : (
 		<KeyboardAvoidingView style={styles.container} behavior={"padding"}>
 			<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
 				<ImageBackground source={background} style={styles.background}>
+					<Link to="/" style={styles.backLink}>
+						<Image source={back} style={styles.back} />
+					</Link>
 					<View style={styles.content} onPress={Keyboard.dismiss}>
 						<Image source={logo} style={styles.logo} />
 						<TextInput
@@ -81,6 +119,11 @@ const Signup = () => {
 							onChangeText={handleFirstName}
 							style={styles.input}
 						/>
+						{!isFNameValid ? (
+							<Text style={styles.errorText}>
+								Please enter a valid name.
+							</Text>
+						) : null}
 						<TextInput
 							placeholder="Last Name"
 							textContentType="familyName"
@@ -89,6 +132,11 @@ const Signup = () => {
 							onChangeText={handleLastName}
 							style={styles.input}
 						/>
+						{isLNameValid ? null : (
+							<Text style={styles.errorText}>
+								Please enter a valid name.
+							</Text>
+						)}
 						<TextInput
 							placeholder="Email"
 							textContentType="emailAddress"
@@ -98,6 +146,11 @@ const Signup = () => {
 							onChangeText={handleEmail}
 							style={styles.input}
 						/>
+						{isEmailValid ? null : (
+							<Text style={styles.errorText}>
+								Please enter a valid email.
+							</Text>
+						)}
 						<TextInput
 							placeholder="Password"
 							secureTextEntry
@@ -107,6 +160,13 @@ const Signup = () => {
 							onChangeText={handlePassword}
 							style={styles.input}
 						/>
+						{isPasswordValid ? null : (
+							<Text style={styles.errorText}>
+								Password must contain at least 8 characters, a
+								number and both lower and uppercase letters and
+								special characters.
+							</Text>
+						)}
 						<TextInput
 							placeholder="Confirm Password"
 							secureTextEntry
@@ -116,17 +176,14 @@ const Signup = () => {
 							onChangeText={handleConfirmPassword}
 							style={styles.input}
 						/>
+						{isCPasswordValid ? null : (
+							<Text style={styles.errorText}>
+								Passwords do not match.
+							</Text>
+						)}
 						<TouchableOpacity
 							style={styles.button}
-							onPress={() =>
-								register(
-									firstName,
-									lastName,
-									email,
-									password,
-									confirmPassword
-								)
-							}
+							onPress={() => validate()}
 						>
 							<Text style={styles.buttonText}>Sign Up</Text>
 						</TouchableOpacity>
@@ -160,7 +217,8 @@ const styles = StyleSheet.create({
 		borderColor: "#03989E",
 		borderRadius: 6,
 		width: 255,
-		marginBottom: 15,
+		marginTop: 15,
+		marginBottom: 4,
 		paddingLeft: 13,
 		backgroundColor: "#fff",
 	},
@@ -175,6 +233,21 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		paddingTop: 20,
 		color: "#fff",
+	},
+	backLink: {
+		alignSelf: "flex-start",
+		paddingTop: 50,
+	},
+	back: {
+		height: 30,
+		width: 30,
+		marginLeft: 20,
+	},
+	errorText: {
+		color: "#000",
+		alignSelf: "flex-start",
+		backgroundColor: "red",
+		padding: 2,
 	},
 });
 
