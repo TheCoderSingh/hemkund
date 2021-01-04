@@ -47,7 +47,6 @@ const Login = () => {
 				.signInWithEmailAndPassword(email, password)
 				.then((user) => {
 					setIsUserValid(true);
-					console.log(user);
 				})
 				.then(() => {
 					setIsSignedIn(true);
