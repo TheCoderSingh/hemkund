@@ -16,23 +16,13 @@ const Projects = () => {
 	return (
 		<View style={styles.container}>
 			<ImageBackground source={background} style={styles.background}>
-				<TouchableOpacity style={styles.button}>
-					<Link to="/new-project">
-						<Text style={styles.buttonText}>New Project</Text>
-					</Link>
-				</TouchableOpacity>
+				<Link to="/new-project" style={styles.button}>
+					<Text style={styles.buttonText}>New Project</Text>
+				</Link>
 				<ScrollView
 					showsVerticalScrollIndicator={false}
 					contentContainerStyle={{ paddingBottom: 40 }}
 				>
-					<Project />
-					<Project />
-					<Project />
-					<Project />
-					<Project />
-					<Project />
-					<Project />
-					<Project />
 					<Project />
 				</ScrollView>
 			</ImageBackground>

@@ -8,21 +8,78 @@ import {
 	View,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
 import plus from "../../assets/plus.png";
 import cross from "../../assets/cross.png";
+import { Link, Redirect } from "react-router-native";
 
 const NewProject = () => {
-	const [project, setProject] = useState();
+	const [projectName, setProjectName] = useState();
+	const [projectCode, setProjectCode] = useState();
+	const [currUserId, setCurrUserId] = useState();
+	const [isProjectCreated, setIsProjectCreated] = useState(false);
+	const [projectId, setProjectId] = useState();
+	// let currUser;
+	// const [project, setProject] = useState();
 
 	useEffect(() => {
-		setProject("Select Project");
+		// setProject("Select Project");
+		firebase.auth().onAuthStateChanged((user) => {
+			if (user) {
+				setCurrUserId(user.uid);
+			}
+		});
 	}, []);
 
-	return (
+	const validate = () => {
+		if (projectName) {
+			let projectsRef = firebase.database().ref().child("projects");
+			let newProjectRef = projectsRef.push();
+
+			if (
+				!projectCode ||
+				projectCode === "undefined" ||
+				typeof projectCode === undefined ||
+				projectCode.trim().length === 0
+			) {
+				newProjectRef.set({
+					project_name: projectName,
+					created_by: currUserId,
+					status: "active",
+					created_on: new Date().toLocaleString(),
+					project_id: newProjectRef.key,
+				});
+
+				setProjectId(newProjectRef.key);
+			} else {
+				newProjectRef.set({
+					project_name: projectName,
+					project_code: projectCode,
+					created_by: currUserId,
+					status: "active",
+					created_on: new Date().toLocaleString(),
+					project_id: newProjectRef.key,
+				});
+				setProjectId(newProjectRef.key);
+			}
+
+			setIsProjectCreated(true);
+		}
+	};
+
+	const handleProjectName = (projName) => setProjectName(projName);
+
+	const handleProjectCode = (projCode) => setProjectCode(projCode);
+
+	return isProjectCreated ? (
+		<Redirect to={"/project/" + projectId} />
+	) : (
 		<View style={styles.container}>
-			<View style={styles.crossContainer}>
+			<Link to="/projects" style={styles.crossContainer}>
 				<Image source={cross} style={styles.cross} />
-			</View>
+			</Link>
 			<View style={styles.topArea}>
 				<Image source={plus} style={styles.plus} />
 				<Text style={styles.title}>New Project</Text>
@@ -30,15 +87,17 @@ const NewProject = () => {
 					placeholder="Project Name"
 					style={styles.input}
 					placeholderTextColor="#fff"
+					onChangeText={handleProjectName}
 				/>
 				<TextInput
 					placeholder="Project Code (Optional)"
 					style={styles.input}
 					placeholderTextColor="#fff"
+					onChangeText={handleProjectCode}
 				/>
-				<Text style={styles.cloneText}>Clone existing project</Text>
+				{/* <Text style={styles.cloneText}>Clone existing project</Text> */}
 			</View>
-			<Picker
+			{/* <Picker
 				selectedValue={project}
 				onValueChange={(itemValue, itemIndex) => setProject(itemValue)}
 				style={styles.picker}
@@ -47,8 +106,13 @@ const NewProject = () => {
 				<Picker.Item label="Camrose Checkpoint" value="checkpoint" />
 				<Picker.Item label="Camrose Walmart" value="walmart" />
 				<Picker.Item label="Chapelle" value="chapelle" />
-			</Picker>
-			<TouchableOpacity style={styles.bottomArea}>
+			</Picker> */}
+			<TouchableOpacity
+				style={styles.bottomArea}
+				onPress={() => {
+					validate();
+				}}
+			>
 				<Text style={styles.createText}>Create</Text>
 			</TouchableOpacity>
 		</View>

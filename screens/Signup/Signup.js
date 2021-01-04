@@ -80,11 +80,12 @@ const Signup = () => {
 		firebase
 			.auth()
 			.createUserWithEmailAndPassword(email, password)
-			.then(() => {
+			.then((user) => {
 				let usersRef = firebase.database().ref().child("users");
 
 				let newUserRef = usersRef.push();
 				newUserRef.set({
+					uid: user.user.uid,
 					first_name: firstName,
 					last_name: lastName,
 					email: email,

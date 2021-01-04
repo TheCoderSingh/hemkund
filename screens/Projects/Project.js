@@ -8,7 +8,8 @@ import {
 } from "react-native";
 import Plan from "../../components/Plan";
 
-const Project = () => {
+const Project = (props) => {
+	console.log(props.match.params.id);
 	return (
 		<View style={styles.container}>
 			<Text style={styles.projectTitle}>Chapelle</Text>

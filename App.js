@@ -14,8 +14,8 @@ export default function App() {
 			<View style={styles.container}>
 				{/* <Route exact path="/" component={Projects} />*/}
 				<Route path="/projects" component={Projects} />
-				{/* <Route path="/new-project" component={NewProject} /> */}
-				{/* <Route path="/project" component={Project} /> */}
+				<Route path="/new-project" component={NewProject} />
+				<Route path="/project/:id" component={Project} />
 				<Route path="/signup" component={Signup} />
 				<Route exact path="/" component={Login} />
 			</View>
