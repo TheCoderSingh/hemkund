@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import firebase from "firebase/app";
 import trash from "../assets/trash.png";
+import { Redirect } from "react-router-native";
 
 const Project = (props) => {
+	const [projectId, setProjectId] = useState();
 	const [projectName, setProjectName] = useState();
 	const [projectDate, setProjectDate] = useState();
+	const [projectClicked, setProjectClicked] = useState(false);
 
 	useEffect(() => {
 		let projectsRef = firebase.database().ref("projects");
@@ -16,6 +19,7 @@ const Project = (props) => {
 			.on(
 				"child_added",
 				(data) => {
+					setProjectId(data.val().project_id);
 					setProjectName(data.val().project_name);
 					setProjectDate(data.val().created_on);
 				},
@@ -25,8 +29,15 @@ const Project = (props) => {
 			);
 	}, []);
 
-	return (
-		<TouchableOpacity style={styles.card}>
+	return projectClicked ? (
+		<Redirect to={"/project/" + projectId} />
+	) : (
+		<TouchableOpacity
+			style={styles.card}
+			onPress={() => {
+				setProjectClicked(true);
+			}}
+		>
 			<View style={styles.topArea}>
 				<Text style={styles.projectTitle}>{projectName}</Text>
 				<Image source={trash} style={styles.icon} />

@@ -1,21 +1,49 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
+	Image,
 	ScrollView,
 	StyleSheet,
 	Text,
 	TouchableOpacity,
 	View,
 } from "react-native";
+import firebase from "firebase/app";
 import Plan from "../../components/Plan";
+import { Link } from "react-router-native";
+import back from "../../assets/back.png";
 
 const Project = (props) => {
-	console.log(props.match.params.id);
+	const [projectName, setProjectName] = useState();
+
+	useEffect(() => {
+		let projectsRef = firebase.database().ref("projects");
+
+		projectsRef
+			.orderByChild("project_id")
+			.equalTo(props.match.params.id)
+			.on(
+				"child_added",
+				(data) => {
+					setProjectName(data.val().project_name);
+				},
+				(error) => {
+					console.log("Error: " + error.code);
+				}
+			);
+	}, []);
+
 	return (
 		<View style={styles.container}>
-			<Text style={styles.projectTitle}>Chapelle</Text>
-			<TouchableOpacity style={styles.newPlanButton}>
+			<Link to="/projects" style={styles.backLink}>
+				<Image source={back} style={styles.back} />
+			</Link>
+			<Text style={styles.projectTitle}>{projectName}</Text>
+			<Link
+				to={"/new-plan/" + props.match.params.id}
+				style={styles.newPlanButton}
+			>
 				<Text style={styles.newPlanText}>New Plan</Text>
-			</TouchableOpacity>
+			</Link>
 			<ScrollView>
 				<View>
 					<Text style={styles.sectionText}>
@@ -28,12 +56,6 @@ const Project = (props) => {
 					>
 						<Plan />
 						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
 					</ScrollView>
 				</View>
 				<View>
@@ -45,69 +67,6 @@ const Project = (props) => {
 						showsHorizontalScrollIndicator="false"
 						style={styles.plans}
 					>
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-					</ScrollView>
-				</View>
-				<View>
-					<Text style={styles.sectionText}>
-						Base Architectural Plans (8 Plans)
-					</Text>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator="false"
-						style={styles.plans}
-					>
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-					</ScrollView>
-				</View>
-				<View>
-					<Text style={styles.sectionText}>
-						Base Architectural Plans (8 Plans)
-					</Text>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator="false"
-						style={styles.plans}
-					>
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-					</ScrollView>
-				</View>
-				<View>
-					<Text style={styles.sectionText}>
-						Base Architectural Plans (8 Plans)
-					</Text>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator="false"
-						style={styles.plans}
-					>
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
-						<Plan />
 						<Plan />
 						<Plan />
 					</ScrollView>
@@ -124,10 +83,12 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 	},
 	projectTitle: {
-		marginTop: 50,
-		fontSize: 24,
+		marginTop: 10,
+		fontSize: 28,
 		marginLeft: 12,
 		color: "#fff",
+		textAlign: "center",
+		fontWeight: "bold",
 	},
 	newPlanButton: {
 		width: 200,
@@ -152,6 +113,15 @@ const styles = StyleSheet.create({
 	},
 	plans: {
 		marginBottom: 25,
+	},
+	backLink: {
+		alignSelf: "flex-start",
+		paddingTop: 50,
+	},
+	back: {
+		height: 30,
+		width: 30,
+		marginLeft: 20,
 	},
 });
 
