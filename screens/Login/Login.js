@@ -1,28 +1,84 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Image,
 	ImageBackground,
 	StyleSheet,
 	Text,
 	TextInput,
+	TouchableOpacity,
 	View,
 } from "react-native";
-import { Link } from "react-router-native";
+import { Link, Redirect } from "react-router-native";
+import firebase from "firebase/app";
 import background from "../../assets/background.jpg";
 import logo from "../../assets/logo-green.png";
 
 const Login = () => {
-	return (
+	const [email, setEmail] = useState();
+	const [password, setPassword] = useState();
+	const [isUserValid, setIsUserValid] = useState(true);
+	const [isSignedIn, setIsSignedIn] = useState();
+
+	useEffect(() => {
+		firebase.auth().onAuthStateChanged(function (user) {
+			if (user) {
+				setIsSignedIn(true);
+			} else {
+				setIsSignedIn(false);
+			}
+		});
+	}, []);
+
+	const handleEmail = (emailAdd) => {
+		setEmail(emailAdd);
+		console.log(emailAdd);
+	};
+
+	const handlePassword = (pass) => {
+		setPassword(pass);
+	};
+
+	const signIn = () => {
+		if (email && password) {
+			setEmail(email.trim().toLowerCase());
+
+			firebase
+				.auth()
+				.signInWithEmailAndPassword(email, password)
+				.then((user) => {
+					setIsUserValid(true);
+					console.log(user);
+				})
+				.then(() => {
+					setIsSignedIn(true);
+				})
+				.catch((error) => {
+					var errorCode = error.code;
+					var errorMessage = error.message;
+					setIsUserValid(false);
+				});
+		} else setIsUserValid(false);
+	};
+
+	return isSignedIn ? (
+		<Redirect to="/projects" />
+	) : (
 		<View style={styles.container}>
 			<ImageBackground source={background} style={styles.background}>
 				<View style={styles.content}>
 					<Image source={logo} style={styles.logo} />
+					{!isUserValid ? (
+						<Text style={styles.errorText}>
+							Invalid email or password.
+						</Text>
+					) : null}
 					<TextInput
 						placeholder="Email"
 						textContentType="emailAddress"
 						autoCompleteType="email"
 						keyboardType="email-address"
 						placeholderTextColor="grey"
+						onChangeText={handleEmail}
 						style={styles.input}
 					/>
 					<TextInput
@@ -31,13 +87,17 @@ const Login = () => {
 						textContentType="password"
 						autoCompleteType="password"
 						placeholderTextColor="grey"
+						onChangeText={handlePassword}
 						style={styles.input}
 					/>
 				</View>
 				<View style={styles.buttons}>
-					<Link to="/login" style={styles.button}>
+					<TouchableOpacity
+						style={styles.button}
+						onPress={() => signIn()}
+					>
 						<Text style={styles.buttonText}>Login</Text>
-					</Link>
+					</TouchableOpacity>
 					<Link to="/signup" style={styles.button}>
 						<Text style={styles.buttonText}>Sign Up</Text>
 					</Link>
@@ -90,6 +150,12 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		paddingTop: 20,
 		color: "#fff",
+	},
+	errorText: {
+		color: "#000",
+		alignSelf: "flex-start",
+		backgroundColor: "red",
+		padding: 2,
 	},
 });
 
