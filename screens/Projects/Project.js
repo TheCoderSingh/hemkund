@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-	Image,
-	ScrollView,
-	StyleSheet,
-	Text,
-	TouchableOpacity,
-	View,
-} from "react-native";
+import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import firebase from "firebase/app";
-import Plan from "../../components/Plan";
+import Plans from "../../components/Plans";
 import { Link } from "react-router-native";
 import back from "../../assets/back.png";
 
@@ -46,6 +39,18 @@ const Project = (props) => {
 			</Link>
 			<ScrollView>
 				<View>
+					{/* <Text style={styles.sectionText}>
+						Base Architectural Plans (8 Plans)
+					</Text> */}
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator="false"
+						style={styles.plans}
+					>
+						<Plans projectid={props.match.params.id} />
+					</ScrollView>
+				</View>
+				{/* <View>
 					<Text style={styles.sectionText}>
 						Base Architectural Plans (8 Plans)
 					</Text>
@@ -57,20 +62,7 @@ const Project = (props) => {
 						<Plan />
 						<Plan />
 					</ScrollView>
-				</View>
-				<View>
-					<Text style={styles.sectionText}>
-						Base Architectural Plans (8 Plans)
-					</Text>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator="false"
-						style={styles.plans}
-					>
-						<Plan />
-						<Plan />
-					</ScrollView>
-				</View>
+				</View> */}
 			</ScrollView>
 		</View>
 	);
