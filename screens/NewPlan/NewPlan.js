@@ -7,9 +7,10 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
+// import { Picker } from "@react-native-picker/picker";
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/storage";
 import { Link, Redirect } from "react-router-native";
 import { getDocumentAsync } from "expo-document-picker";
 import plus from "../../assets/plus.png";
@@ -20,7 +21,10 @@ const NewPlan = (props) => {
 	const [categoryName, setCategoryName] = useState();
 	const [isPlanCreated, setIsPlanCreated] = useState(false);
 	const [currUserId, setCurrUserId] = useState();
-	const [planId, setPlanId] = useState();
+	const [uploadProgress, setUploadProgress] = useState(0);
+	const [blob, setBlob] = useState({});
+	const [isPlanNameValid, setIsPlanNameValid] = useState(true);
+	const [ref, setRef] = useState();
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged((user) => {
@@ -32,30 +36,55 @@ const NewPlan = (props) => {
 
 	const validate = () => {
 		if (planName) {
-			let plansRef = firebase.database().ref().child("plans");
-			let newPlanRef = plansRef.push();
-
-			newPlanRef.set({
-				plan_id: newPlanRef.key,
-				plan_name: planName,
-				created_by: currUserId,
-				project_id: props.match.params.id,
-				status: "active",
-				category: categoryName || "uncategorized",
-			});
-
-			setPlanId(newPlanRef.key);
-			setIsPlanCreated(true);
+			setIsPlanNameValid(true);
+			uploadFile();
+		} else {
+			setIsPlanNameValid(false);
 		}
+	};
+
+	const uploadFile = () => {
+		let task = ref.put(blob);
+
+		task.on(
+			"state_changed",
+			(snapshot) => {
+				let progress =
+					(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+
+				if (firebase.storage.TaskState.RUNNING)
+					setUploadProgress(progress);
+			},
+			(error) => {
+				console.log("Error uploading file: " + error);
+			},
+			() => {
+				console.log("Upload successful");
+
+				let plansRef = firebase.database().ref().child("plans");
+				let newPlanRef = plansRef.push();
+
+				newPlanRef.set({
+					plan_id: newPlanRef.key,
+					plan_name: planName,
+					created_by: currUserId,
+					project_id: props.match.params.id,
+					status: "active",
+					category: categoryName || "uncategorized",
+				});
+
+				setIsPlanCreated(true);
+			}
+		);
 	};
 
 	const handlePlanName = (_planName) => setPlanName(_planName);
 
-	const handlePlanCategory = (_planCategory) =>
-		setCategoryName(_planCategory);
+	// const handlePlanCategory = (_planCategory) =>
+	// 	setCategoryName(_planCategory);
 
 	return isPlanCreated ? (
-		<Redirect to={"/plan/" + planId} />
+		<Redirect to={"/project/" + props.match.params.id} />
 	) : (
 		<View style={styles.container}>
 			<Link
@@ -67,6 +96,11 @@ const NewPlan = (props) => {
 			<View style={styles.topArea}>
 				<Image source={plus} style={styles.plus} />
 				<Text style={styles.title}>New Plan</Text>
+				{!isPlanNameValid ? (
+					<Text style={styles.errorText}>
+						Please enter a valid name.
+					</Text>
+				) : null}
 				<TextInput
 					placeholder="Plan Name"
 					style={styles.input}
@@ -80,11 +114,25 @@ const NewPlan = (props) => {
 					onChangeText={handlePlanCategory}
 				/> */}
 				{/* <Text style={styles.cloneText}>Plan Category</Text> */}
+				{uploadProgress > 0 && uploadProgress < 100 ? (
+					<Text>Upload Progress: {uploadProgress.toFixed(0)}%</Text>
+				) : null}
+				{uploadProgress === 100 ? <Text>Upload Complete</Text> : null}
 				<TouchableOpacity
 					style={styles.button}
 					onPress={() => {
-						getDocumentAsync().then((response) => {
-							console.log(response);
+						getDocumentAsync().then(async (response) => {
+							try {
+								let storageRef = firebase.storage().ref();
+								setRef(storageRef.child(response.name));
+
+								let fetchResponse = await fetch(response.uri);
+								let blob = await fetchResponse.blob();
+
+								setBlob(blob);
+							} catch (error) {
+								console.log(error.message);
+							}
 						});
 					}}
 				>
@@ -172,7 +220,7 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		alignSelf: "center",
-		marginTop: 80,
+		marginTop: 20,
 		backgroundColor: "#fff",
 		borderRadius: 6,
 		height: 45,
@@ -184,6 +232,13 @@ const styles = StyleSheet.create({
 		textAlign: "center",
 		paddingTop: 10,
 		fontSize: 18,
+	},
+	errorText: {
+		color: "#000",
+		// backgroundColor: "red",
+		padding: 2,
+		marginBottom: 10,
+		fontWeight: "bold",
 	},
 });
 
