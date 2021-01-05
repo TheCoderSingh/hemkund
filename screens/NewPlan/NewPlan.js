@@ -37,45 +37,48 @@ const NewPlan = (props) => {
 	const validate = () => {
 		if (planName) {
 			setIsPlanNameValid(true);
-			uploadFile();
+			uploadAndCreate();
 		} else {
 			setIsPlanNameValid(false);
 		}
 	};
 
-	const uploadFile = () => {
-		let task = ref.put(blob);
+	const uploadAndCreate = () => {
+		if (Object.keys(blob).length !== 0) {
+			let task = ref.put(blob);
 
-		task.on(
-			"state_changed",
-			(snapshot) => {
-				let progress =
-					(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+			task.on(
+				"state_changed",
+				(snapshot) => {
+					let progress =
+						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-				if (firebase.storage.TaskState.RUNNING)
-					setUploadProgress(progress);
-			},
-			(error) => {
-				console.log("Error uploading file: " + error);
-			},
-			() => {
-				console.log("Upload successful");
+					if (firebase.storage.TaskState.RUNNING)
+						setUploadProgress(progress);
+				},
+				(error) => {
+					console.log("Error uploading file: " + error);
+				},
+				() => {}
+			);
+		}
 
-				let plansRef = firebase.database().ref().child("plans");
-				let newPlanRef = plansRef.push();
+		createPlan();
+		setIsPlanCreated(true);
+	};
 
-				newPlanRef.set({
-					plan_id: newPlanRef.key,
-					plan_name: planName,
-					created_by: currUserId,
-					project_id: props.match.params.id,
-					status: "active",
-					category: categoryName || "uncategorized",
-				});
+	const createPlan = () => {
+		let plansRef = firebase.database().ref().child("plans");
+		let newPlanRef = plansRef.push();
 
-				setIsPlanCreated(true);
-			}
-		);
+		newPlanRef.set({
+			plan_id: newPlanRef.key,
+			plan_name: planName,
+			created_by: currUserId,
+			project_id: props.match.params.id,
+			status: "active",
+			category: categoryName || "uncategorized",
+		});
 	};
 
 	const handlePlanName = (_planName) => setPlanName(_planName);
