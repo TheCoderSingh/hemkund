@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
 	Image,
 	StyleSheet,
@@ -25,13 +25,21 @@ const NewPlan = (props) => {
 	const [blob, setBlob] = useState({});
 	const [isPlanNameValid, setIsPlanNameValid] = useState(true);
 	const [ref, setRef] = useState();
+	const [fileUrl, setFileUrl] = useState();
+
+	const mountedRef = useRef(true);
 
 	useEffect(() => {
-		firebase.auth().onAuthStateChanged((user) => {
+		const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
 				setCurrUserId(user.uid);
 			}
 		});
+
+		return () => {
+			mountedRef.current = false;
+			unsubscribe();
+		};
 	}, []);
 
 	const validate = () => {
@@ -43,23 +51,32 @@ const NewPlan = (props) => {
 		}
 	};
 
-	const uploadAndCreate = () => {
+	const uploadAndCreate = async () => {
 		if (Object.keys(blob).length !== 0) {
 			let task = ref.put(blob);
 
-			task.on(
+			await task.on(
 				"state_changed",
 				(snapshot) => {
 					let progress =
 						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-					if (firebase.storage.TaskState.RUNNING)
-						setUploadProgress(progress);
+					if (firebase.storage.TaskState.RUNNING) {
+						if (mountedRef.current) {
+							setUploadProgress(progress);
+						}
+					}
 				},
 				(error) => {
 					console.log("Error uploading file: " + error);
 				},
-				() => {}
+				() => {
+					task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+						if (mountedRef.current) {
+							setFileUrl(downloadURL);
+						}
+					});
+				}
 			);
 		}
 
@@ -78,6 +95,7 @@ const NewPlan = (props) => {
 			project_id: props.match.params.id,
 			status: "active",
 			category: categoryName || "uncategorized",
+			file_url: fileUrl || "",
 		});
 	};
 
@@ -127,12 +145,18 @@ const NewPlan = (props) => {
 						getDocumentAsync().then(async (response) => {
 							try {
 								let storageRef = firebase.storage().ref();
-								setRef(storageRef.child(response.name));
+								setRef(
+									storageRef.child(
+										response.uri.split("/")[14]
+									)
+								);
 
 								let fetchResponse = await fetch(response.uri);
 								let blob = await fetchResponse.blob();
 
-								setBlob(blob);
+								if (mountedRef.current) {
+									setBlob(blob);
+								}
 							} catch (error) {
 								console.log(error.message);
 							}

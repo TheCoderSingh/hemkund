@@ -7,6 +7,7 @@ const Plans = (props) => {
 
 	useEffect(() => {
 		let plansRef = firebase.database().ref("plans");
+		let mounted = true;
 
 		plansRef
 			.orderByChild("project_id")
@@ -15,13 +16,18 @@ const Plans = (props) => {
 				"value",
 				(snapshot) => {
 					snapshot.forEach((plan) => {
-						setPlans((plans) => [...plans, plan.val()]);
+						if (mounted)
+							setPlans((plans) => [...plans, plan.val()]);
 					});
 				},
 				(error) => {
 					console.log("Error: " + error.code);
 				}
 			);
+
+		return () => {
+			mounted = false;
+		};
 	}, []);
 
 	return plans.map((plan) => {

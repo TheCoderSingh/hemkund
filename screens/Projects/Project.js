@@ -10,6 +10,7 @@ const Project = (props) => {
 
 	useEffect(() => {
 		let projectsRef = firebase.database().ref("projects");
+		let mounted = true;
 
 		projectsRef
 			.orderByChild("project_id")
@@ -17,12 +18,16 @@ const Project = (props) => {
 			.on(
 				"child_added",
 				(data) => {
-					setProjectName(data.val().project_name);
+					if (mounted) setProjectName(data.val().project_name);
 				},
 				(error) => {
 					console.log("Error: " + error.code);
 				}
 			);
+
+		return () => {
+			mounted = false;
+		};
 	}, []);
 
 	return (
