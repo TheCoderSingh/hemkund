@@ -25,7 +25,6 @@ const NewPlan = (props) => {
 	const [blob, setBlob] = useState({});
 	const [isPlanNameValid, setIsPlanNameValid] = useState(true);
 	const [ref, setRef] = useState();
-	const [fileUrl, setFileUrl] = useState();
 
 	const mountedRef = useRef(true);
 
@@ -45,58 +44,64 @@ const NewPlan = (props) => {
 	const validate = () => {
 		if (planName) {
 			setIsPlanNameValid(true);
-			uploadAndCreate();
+			if (Object.keys(blob).length !== 0) uploadFile();
+			else createPlan();
 		} else {
 			setIsPlanNameValid(false);
 		}
 	};
 
-	const uploadAndCreate = async () => {
-		if (Object.keys(blob).length !== 0) {
-			let task = ref.put(blob);
+	const uploadFile = () => {
+		let task = ref.put(blob);
 
-			await task.on(
-				"state_changed",
-				(snapshot) => {
-					let progress =
-						(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+		task.on(
+			"state_changed",
+			(snapshot) => {
+				let progress =
+					(snapshot.bytesTransferred / snapshot.totalBytes) * 100;
 
-					if (firebase.storage.TaskState.RUNNING) {
-						if (mountedRef.current) {
-							setUploadProgress(progress);
-						}
+				if (firebase.storage.TaskState.RUNNING) {
+					if (mountedRef.current) {
+						setUploadProgress(progress);
 					}
-				},
-				(error) => {
-					console.log("Error uploading file: " + error);
-				},
-				() => {
-					task.snapshot.ref.getDownloadURL().then((downloadURL) => {
-						if (mountedRef.current) {
-							setFileUrl(downloadURL);
-						}
-					});
 				}
-			);
-		}
-
-		createPlan();
-		setIsPlanCreated(true);
+			},
+			(error) => {
+				console.log("Error uploading file: " + error);
+			},
+			() => {
+				console.log("Should run first");
+				task.snapshot.ref.getDownloadURL().then((downloadURL) => {
+					setFileUrl(downloadURL);
+					createPlan(downloadURL);
+				});
+			}
+		);
 	};
 
-	const createPlan = () => {
+	const createPlan = (url) => {
+		console.log("Should run second");
 		let plansRef = firebase.database().ref().child("plans");
 		let newPlanRef = plansRef.push();
 
-		newPlanRef.set({
-			plan_id: newPlanRef.key,
-			plan_name: planName,
-			created_by: currUserId,
-			project_id: props.match.params.id,
-			status: "active",
-			category: categoryName || "uncategorized",
-			file_url: fileUrl || "",
-		});
+		newPlanRef
+			.set({
+				plan_id: newPlanRef.key,
+				plan_name: planName,
+				created_by: currUserId,
+				project_id: props.match.params.id,
+				status: "active",
+				category: categoryName || "uncategorized",
+				file_url: url || "",
+			})
+			.then((response) => {
+				console.log(response);
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+
+		setIsPlanCreated(true);
 	};
 
 	const handlePlanName = (_planName) => setPlanName(_planName);
