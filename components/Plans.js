@@ -39,7 +39,7 @@ const Plans = (props) => {
 	}, []);
 
 	return plans.map((plan) => {
-		return (
+		return plan.file_url ? (
 			<TouchableOpacity
 				style={styles.container}
 				key={plan.plan_id}
@@ -50,6 +50,10 @@ const Plans = (props) => {
 			>
 				<Text style={styles.planText}>{plan.plan_name}</Text>
 			</TouchableOpacity>
+		) : (
+			<View style={styles.container} key={plan.plan_id}>
+				<Text style={styles.planText}>{plan.plan_name}</Text>
+			</View>
 		);
 	});
 };
