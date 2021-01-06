@@ -10,7 +10,6 @@ import { Link } from "react-router-native";
 import firebase from "firebase/app";
 import background from "../../assets/background.jpg";
 import Project from "../../components/Project";
-import Footer from "../../Footer/Footer";
 
 const Projects = () => {
 	const [projects, setProjects] = useState([]);
@@ -49,7 +48,6 @@ const Projects = () => {
 					})}
 				</ScrollView>
 			</ImageBackground>
-			<Footer />
 		</View>
 	);
 };

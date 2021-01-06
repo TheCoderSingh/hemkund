@@ -4,6 +4,7 @@ import firebase from "firebase/app";
 import Plans from "../../components/Plans";
 import { Link } from "react-router-native";
 import back from "../../assets/back.png";
+import Footer from "../../Footer/Footer";
 
 const Project = (props) => {
 	const [projectName, setProjectName] = useState();
@@ -69,6 +70,10 @@ const Project = (props) => {
 					</ScrollView>
 				</View> */}
 			</ScrollView>
+			<Footer
+				projectid={props.match.params.id}
+				projectname={projectName}
+			/>
 		</View>
 	);
 };
