@@ -84,22 +84,15 @@ const NewPlan = (props) => {
 		let plansRef = firebase.database().ref().child("plans");
 		let newPlanRef = plansRef.push();
 
-		newPlanRef
-			.set({
-				plan_id: newPlanRef.key,
-				plan_name: planName,
-				created_by: currUserId,
-				project_id: props.match.params.id,
-				status: "active",
-				category: categoryName || "uncategorized",
-				file_url: url || "",
-			})
-			.then((response) => {
-				console.log(response);
-			})
-			.catch((error) => {
-				console.log(error);
-			});
+		newPlanRef.set({
+			plan_id: newPlanRef.key,
+			plan_name: planName,
+			created_by: currUserId,
+			project_id: props.match.params.id,
+			status: "active",
+			category: categoryName || "uncategorized",
+			file_url: url || "",
+		});
 
 		setIsPlanCreated(true);
 	};
