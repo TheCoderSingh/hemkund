@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import {
+	StyleSheet,
+	Text,
+	View,
+	Linking,
+	TouchableOpacity,
+} from "react-native";
 import firebase from "firebase/app";
+import { Link } from "react-router-native";
+import * as WebBrowser from "expo-web-browser";
 
 const Plans = (props) => {
 	const [plans, setPlans] = useState([]);
@@ -32,9 +40,16 @@ const Plans = (props) => {
 
 	return plans.map((plan) => {
 		return (
-			<View style={styles.container} key={plan.plan_id}>
+			<TouchableOpacity
+				style={styles.container}
+				key={plan.plan_id}
+				onPress={() => {
+					// Linking.openURL(plan.file_url);
+					WebBrowser.openBrowserAsync(plan.file_url);
+				}}
+			>
 				<Text style={styles.planText}>{plan.plan_name}</Text>
-			</View>
+			</TouchableOpacity>
 		);
 	});
 };

@@ -70,9 +70,7 @@ const NewPlan = (props) => {
 				console.log("Error uploading file: " + error);
 			},
 			() => {
-				console.log("Should run first");
 				task.snapshot.ref.getDownloadURL().then((downloadURL) => {
-					setFileUrl(downloadURL);
 					createPlan(downloadURL);
 				});
 			}
@@ -80,7 +78,6 @@ const NewPlan = (props) => {
 	};
 
 	const createPlan = (url) => {
-		console.log("Should run second");
 		let plansRef = firebase.database().ref().child("plans");
 		let newPlanRef = plansRef.push();
 
