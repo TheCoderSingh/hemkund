@@ -8,7 +8,6 @@ import logout from "../assets/logout.png";
 import { Link } from "react-router-native";
 
 const Footer = (props) => {
-	console.log(props);
 	return (
 		<View style={styles.footer}>
 			<Link to="/projects" style={styles.item}>

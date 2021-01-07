@@ -1,53 +1,103 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+	Image,
+	ScrollView,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+} from "react-native";
 import { Link } from "react-router-native";
+import firebase from "firebase/app";
 import check from "../../assets/check.png";
 import Footer from "../../Footer/Footer";
 
 const Tasks = (props) => {
-	console.log(props.match.params.id);
+	const [tasks, setTasks] = useState([]);
+	const [taskChanged, setTaskChanged] = useState(false);
+
+	useEffect(() => {
+		setTasks([]);
+		let tasksRef = firebase.database().ref("tasks");
+
+		tasksRef
+			.orderByChild("project_id")
+			.equalTo(props.match.params.id)
+			.on(
+				"value",
+				(snapshot) => {
+					snapshot.forEach((task) => {
+						setTasks((tasks) => [...tasks, task.val()]);
+					});
+				},
+				(error) => {
+					console.log("Error: " + error.code);
+				}
+			);
+	}, [taskChanged]);
+
+	const toggleCheckbox = (taskid, isComplete) => {
+		let tasksRef = firebase.database().ref().child("tasks");
+
+		tasksRef.child(taskid).update({ complete: isComplete });
+
+		setTaskChanged(!taskChanged);
+	};
+
 	return (
 		<View style={styles.container}>
 			<Text style={styles.tasksHead}>Tasks</Text>
 
-			<View>
-				<Link
-					to={"/new-task/" + props.match.params.id}
-					style={styles.button}
-				>
-					<Text style={styles.buttonText}>New Task</Text>
-				</Link>
-				<View style={styles.tasks}>
-					<View style={styles.task}>
-						<View style={styles.checkbox}>
-							<Image source={check} style={styles.checkmark} />
-						</View>
-						<Text style={styles.taskTxt}>Task 1</Text>
-					</View>
-					<View style={styles.task}>
-						<View style={styles.checkbox}>
-							<Image source={check} style={styles.checkmark} />
-						</View>
+			<Link
+				to={"/new-task/" + props.match.params.id}
+				style={styles.button}
+			>
+				<Text style={styles.buttonText}>New Task</Text>
+			</Link>
+			<ScrollView style={styles.tasks}>
+				{tasks.map((task, index) => {
+					return task.complete ? (
+						<View style={styles.task} key={index}>
+							<TouchableOpacity
+								style={styles.checkbox}
+								onPress={() => {
+									toggleCheckbox(
+										task.task_id,
+										!task.complete
+									);
 
-						<Text style={styles.taskTxt}>Task 1</Text>
-					</View>
-					<View style={styles.task}>
-						<View style={styles.checkbox}>
-							<Image source={check} style={styles.checkmark} />
+									task.complete = !task.complete;
+								}}
+							>
+								<Image
+									source={check}
+									style={styles.checkmark}
+								/>
+							</TouchableOpacity>
+							<Text style={styles.taskTxtCpltd}>
+								{task.task_name}
+							</Text>
 						</View>
+					) : (
+						<View style={styles.task} key={index}>
+							<TouchableOpacity
+								style={styles.checkbox}
+								onPress={() => {
+									toggleCheckbox(
+										task.task_id,
+										!task.complete
+									);
 
-						<Text style={styles.taskTxt}>Task 1</Text>
-					</View>
-					<View style={styles.task}>
-						<View style={styles.checkbox}>
-							<Image source={check} style={styles.checkmark} />
+									task.complete = !task.complete;
+								}}
+							></TouchableOpacity>
+							<Text style={styles.taskTxt}>{task.task_name}</Text>
 						</View>
+					);
+				})}
+			</ScrollView>
 
-						<Text style={styles.taskTxt}>Task 1</Text>
-					</View>
-				</View>
-			</View>
-			<Footer />
+			<Footer style={styles.footer} projectid={props.match.params.id} />
 		</View>
 	);
 };
@@ -77,18 +127,18 @@ const styles = StyleSheet.create({
 	},
 	tasks: {
 		marginTop: 20,
+		width: "80%",
 	},
 	task: {
 		marginBottom: 15,
 		paddingBottom: 10,
 		display: "flex",
 		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
 	},
 	taskTxt: {
 		fontSize: 18,
 		textAlign: "right",
+		marginLeft: 15,
 	},
 	checkbox: {
 		height: 25,
@@ -101,6 +151,12 @@ const styles = StyleSheet.create({
 		position: "absolute",
 		width: 30,
 		height: 30,
+	},
+	taskTxtCpltd: {
+		fontSize: 18,
+		textAlign: "right",
+		marginLeft: 15,
+		textDecorationLine: "line-through",
 	},
 });
 

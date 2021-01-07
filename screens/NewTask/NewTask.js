@@ -32,8 +32,6 @@ const NewTask = (props) => {
 			let tasksRef = firebase.database().ref().child("tasks");
 			let newTaskRef = tasksRef.push();
 
-			console.log(props.match.params.id);
-
 			newTaskRef.set({
 				task_name: taskName,
 				created_by: currUserId,
@@ -41,13 +39,14 @@ const NewTask = (props) => {
 				created_on: new Date().toLocaleString(),
 				project_id: props.match.params.id,
 				task_id: newTaskRef.key,
+				complete: false,
 			});
 			setIsTaskCreated(true);
 		}
 	};
 
 	return isTaskCreated ? (
-		<Redirect to={"/project/" + props.match.params.id} />
+		<Redirect to={"/tasks-view/" + props.match.params.id} />
 	) : (
 		<View style={styles.container}>
 			<Link
