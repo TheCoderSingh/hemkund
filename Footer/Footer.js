@@ -1,14 +1,20 @@
-import React from "react";
-import { Image, StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import home from "../assets/home.png";
 import people from "../assets/people.png";
 import profile from "../assets/profile.png";
 import settings from "../assets/settings.png";
 import logout from "../assets/logout.png";
-import { Link } from "react-router-native";
+import { Link, Redirect } from "react-router-native";
+import firebase from "firebase/app";
+import "firebase/auth";
 
 const Footer = (props) => {
-	return (
+	const [isLoggedOut, setIsLoggedOut] = useState(false);
+
+	return isLoggedOut ? (
+		<Redirect to="/" />
+	) : (
 		<View style={styles.footer}>
 			<Link to="/projects" style={styles.item}>
 				<View>
@@ -32,12 +38,24 @@ const Footer = (props) => {
 					<Text style={styles.footerText}>Calendar</Text>
 				</View>
 			</Link>
-			<Link to="/logout" style={styles.item}>
-				<View>
-					<Image source={logout} style={styles.icon} />
-					<Text style={styles.footerText}>Logout</Text>
-				</View>
-			</Link>
+
+			<TouchableOpacity
+				style={styles.item}
+				onPress={() => {
+					firebase
+						.auth()
+						.signOut()
+						.then(() => {
+							setIsLoggedOut(true);
+						})
+						.catch((error) => {
+							// An error happened.
+						});
+				}}
+			>
+				<Image source={logout} style={styles.icon} />
+				<Text style={styles.footerText}>Logout</Text>
+			</TouchableOpacity>
 		</View>
 	);
 };
