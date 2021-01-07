@@ -21,13 +21,13 @@ const Footer = (props) => {
 				<Image source={people} style={styles.icon} />
 				<Text style={styles.footerText}>Plans</Text>
 			</View> */}
-			<Link to={"/tasks-view" + props.projectid} style={styles.item}>
+			<Link to={"/tasks-view/" + props.projectid} style={styles.item}>
 				<View>
 					<Image source={profile} style={styles.icon} />
 					<Text style={styles.footerText}>Tasks</Text>
 				</View>
 			</Link>
-			<Link to={"/calendar-view" + props.projectid} style={styles.item}>
+			<Link to={"/calendar-view/" + props.projectid} style={styles.item}>
 				<View>
 					<Image source={settings} style={styles.icon} />
 					<Text style={styles.footerText}>Calendar</Text>
