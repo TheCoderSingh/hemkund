@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import home from "../assets/home.png";
-import people from "../assets/people.png";
-import profile from "../assets/profile.png";
+import calendar from "../assets/calendar.png";
+import tasks from "../assets/tasks.png";
 import settings from "../assets/settings.png";
 import logout from "../assets/logout.png";
 import { Link, Redirect } from "react-router-native";
@@ -28,13 +28,13 @@ const Footer = (props) => {
 			</View> */}
 			<Link to={"/tasks-view/" + props.projectid} style={styles.item}>
 				<View>
-					<Image source={profile} style={styles.icon} />
+					<Image source={tasks} style={styles.icon} />
 					<Text style={styles.footerText}>Tasks</Text>
 				</View>
 			</Link>
 			<Link to={"/calendar-view/" + props.projectid} style={styles.item}>
 				<View>
-					<Image source={settings} style={styles.icon} />
+					<Image source={calendar} style={styles.icon} />
 					<Text style={styles.footerText}>Calendar</Text>
 				</View>
 			</Link>
