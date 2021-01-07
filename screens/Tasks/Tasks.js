@@ -78,7 +78,9 @@ const Tasks = (props) => {
 								<Text style={styles.taskTxtCpltd}>
 									{task.task_name}
 								</Text>
-								<Text>Due by: {task.due_date}</Text>
+								<Text>
+									Due by: {task.due_date} - {task.due_time}
+								</Text>
 							</View>
 						</View>
 					) : (

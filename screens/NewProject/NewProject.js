@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
 	Image,
 	StyleSheet,
@@ -21,16 +21,21 @@ const NewProject = () => {
 	const [currUserId, setCurrUserId] = useState();
 	const [isProjectCreated, setIsProjectCreated] = useState(false);
 	const [projectId, setProjectId] = useState();
-	// let currUser;
-	// const [project, setProject] = useState();
+
+	const mountedRef = useRef(true);
 
 	useEffect(() => {
 		// setProject("Select Project");
-		firebase.auth().onAuthStateChanged((user) => {
+		const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
 			if (user) {
 				setCurrUserId(user.uid);
 			}
 		});
+
+		return () => {
+			mountedRef.current = false;
+			unsubscribe();
+		};
 	}, []);
 
 	const validate = () => {
@@ -51,8 +56,9 @@ const NewProject = () => {
 					created_on: new Date().toLocaleString(),
 					project_id: newProjectRef.key,
 				});
-
-				setProjectId(newProjectRef.key);
+				if (mountedRef.current) {
+					setProjectId(newProjectRef.key);
+				}
 			} else {
 				newProjectRef.set({
 					project_name: projectName,
@@ -62,10 +68,14 @@ const NewProject = () => {
 					created_on: new Date().toLocaleString(),
 					project_id: newProjectRef.key,
 				});
-				setProjectId(newProjectRef.key);
+				if (mountedRef.current) {
+					setProjectId(newProjectRef.key);
+				}
 			}
 
-			setIsProjectCreated(true);
+			if (mountedRef.current) {
+				setIsProjectCreated(true);
+			}
 		}
 	};
 

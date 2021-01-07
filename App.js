@@ -9,7 +9,7 @@ import { NativeRouter, Route } from "react-router-native";
 import Signup from "./screens/Signup/Signup";
 import Tasks from "./screens/Tasks/Tasks";
 import NewTask from "./screens/NewTask/NewTask";
-// import Calendar from "./screens/Calendar/Calendar";
+import Calendar from "./screens/Calendar/Calendar";
 import "./utils/firebaseConfig";
 
 export default function App() {
@@ -17,7 +17,7 @@ export default function App() {
 		<NativeRouter>
 			<View style={styles.container}>
 				<Route path="/tasks-view/:id" component={Tasks} />
-				{/* <Route path="/calendar-view" component={Calendar} /> */}
+				<Route path="/calendar-view" component={Calendar} />
 				<Route path="/new-task/:id" component={NewTask} />
 				<Route path="/projects" component={Projects} />
 				<Route path="/new-project" component={NewProject} />
