@@ -74,9 +74,12 @@ const Tasks = (props) => {
 									style={styles.checkmark}
 								/>
 							</TouchableOpacity>
-							<Text style={styles.taskTxtCpltd}>
-								{task.task_name}
-							</Text>
+							<View style={styles.cardContent}>
+								<Text style={styles.taskTxtCpltd}>
+									{task.task_name}
+								</Text>
+								<Text>Due by: {task.due_date}</Text>
+							</View>
 						</View>
 					) : (
 						<View style={styles.task} key={index}>
@@ -91,7 +94,14 @@ const Tasks = (props) => {
 									task.complete = !task.complete;
 								}}
 							></TouchableOpacity>
-							<Text style={styles.taskTxt}>{task.task_name}</Text>
+							<View style={styles.cardContent}>
+								<Text style={styles.taskTxt}>
+									{task.task_name}
+								</Text>
+								<Text>
+									Due by: {task.due_date} - {task.due_time}
+								</Text>
+							</View>
 						</View>
 					);
 				})}
@@ -134,11 +144,14 @@ const styles = StyleSheet.create({
 		paddingBottom: 10,
 		display: "flex",
 		flexDirection: "row",
+		backgroundColor: "#ddd",
+		padding: 10,
+		height: 80,
+		borderRadius: 6,
 	},
 	taskTxt: {
 		fontSize: 18,
 		textAlign: "right",
-		marginLeft: 15,
 	},
 	checkbox: {
 		height: 25,
@@ -146,6 +159,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1,
 		borderRadius: 6,
 		position: "relative",
+		alignSelf: "center",
 	},
 	checkmark: {
 		position: "absolute",
@@ -155,8 +169,11 @@ const styles = StyleSheet.create({
 	taskTxtCpltd: {
 		fontSize: 18,
 		textAlign: "right",
-		marginLeft: 15,
 		textDecorationLine: "line-through",
+	},
+	cardContent: {
+		marginLeft: 15,
+		justifyContent: "space-around",
 	},
 });
 

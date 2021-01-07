@@ -9,6 +9,7 @@
 		"format": "prettier --write \"**/*.{js,json}\""
 	},
 	"dependencies": {
+		"@react-native-community/datetimepicker": "^3.0.9",
 		"@react-native-picker/picker": "^1.9.2",
 		"axios": "^0.21.1",
 		"expo": "~40.0.0",

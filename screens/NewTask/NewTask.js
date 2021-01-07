@@ -8,6 +8,7 @@ import {
 	View,
 } from "react-native";
 import firebase from "firebase/app";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import plus from "../../assets/plus.png";
 import cross from "../../assets/cross.png";
 import { Link, Redirect } from "react-router-native";
@@ -15,7 +16,11 @@ import { Link, Redirect } from "react-router-native";
 const NewTask = (props) => {
 	const [isTaskCreated, setIsTaskCreated] = useState(false);
 	const [taskName, setTaskName] = useState();
+	const [date, setDate] = useState(new Date());
+	const [time, setTime] = useState(new Date());
 	const [currUserId, setCurrUserId] = useState();
+	const [showDate, setShowDate] = useState(false);
+	const [showTime, setShowTime] = useState(false);
 
 	useEffect(() => {
 		firebase.auth().onAuthStateChanged((user) => {
@@ -27,10 +32,32 @@ const NewTask = (props) => {
 
 	const handleTaskName = (taskName) => setTaskName(taskName);
 
+	const handleDateChange = (event, selectedDate) => {
+		const currentDate = selectedDate || date;
+		setDate(currentDate);
+	};
+
+	const handleTimeChange = (event, selectedTime) => {
+		const currentTime = selectedTime || time;
+		setTime(currentTime);
+
+		console.log(currentTime);
+	};
+
+	const showDatePicker = () => {
+		setShowDate(true);
+	};
+
+	const showTimePicker = () => {
+		setShowTime(true);
+	};
+
 	const validate = () => {
 		if (taskName) {
 			let tasksRef = firebase.database().ref().child("tasks");
 			let newTaskRef = tasksRef.push();
+
+			console.log(date);
 
 			newTaskRef.set({
 				task_name: taskName,
@@ -40,6 +67,8 @@ const NewTask = (props) => {
 				project_id: props.match.params.id,
 				task_id: newTaskRef.key,
 				complete: false,
+				due_date: date.toString().substr(0, 15),
+				due_time: time.toString().substring(16, 24),
 			});
 			setIsTaskCreated(true);
 		}
@@ -64,7 +93,39 @@ const NewTask = (props) => {
 					placeholderTextColor="#fff"
 					onChangeText={handleTaskName}
 				/>
+				<TouchableOpacity
+					style={styles.choose}
+					onPress={showDatePicker}
+				>
+					<Text>Choose Date</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					style={styles.choose}
+					onPress={showTimePicker}
+				>
+					<Text>Choose Time</Text>
+				</TouchableOpacity>
 			</View>
+			{showDate && (
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={date}
+					mode="date"
+					is24Hour={true}
+					display="spinner"
+					onChange={handleDateChange}
+				/>
+			)}
+			{showTime && (
+				<DateTimePicker
+					testID="dateTimePicker"
+					value={time}
+					mode="time"
+					is24Hour={true}
+					display="spinner"
+					onChange={handleTimeChange}
+				/>
+			)}
 			<TouchableOpacity
 				style={styles.bottomArea}
 				onPress={() => {
@@ -133,6 +194,14 @@ const styles = StyleSheet.create({
 		paddingTop: 13,
 		fontSize: 18,
 		color: "#03989E",
+	},
+	choose: {
+		backgroundColor: "#fff",
+		width: 255,
+		alignItems: "center",
+		padding: 10,
+		borderRadius: 6,
+		marginBottom: 15,
 	},
 });
 
