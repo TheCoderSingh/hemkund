@@ -10,6 +10,7 @@ import { Link } from "react-router-native";
 import firebase from "firebase/app";
 import background from "../../assets/background.jpg";
 import Project from "../../components/Project";
+import Header from "../../components/Header/Header";
 
 const Projects = () => {
 	const [projects, setProjects] = useState([]);
@@ -43,6 +44,7 @@ const Projects = () => {
 
 	return (
 		<View style={styles.container}>
+			<Header />
 			<ImageBackground source={background} style={styles.background}>
 				<Link to="/new-project" style={styles.button}>
 					<Text style={styles.buttonText}>New Project</Text>
