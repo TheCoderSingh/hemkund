@@ -13,24 +13,32 @@ import Project from "../../components/Project";
 
 const Projects = () => {
 	const [projects, setProjects] = useState([]);
+	const [currUserId, setCurrUserId] = useState();
 
 	useEffect(() => {
-		let projectsRef = firebase.database().ref("projects");
+		firebase.auth().onAuthStateChanged(function (user) {
+			if (user) {
+				let projectsRef = firebase.database().ref("projects");
 
-		projectsRef.on(
-			"value",
-			(snapshot) => {
-				snapshot.forEach((project) => {
-					setProjects((projects) => [
-						...projects,
-						project.val().project_id,
-					]);
-				});
-			},
-			(error) => {
-				console.log("Error: " + error.code);
+				projectsRef
+					.orderByChild("created_by")
+					.equalTo(user.uid)
+					.on(
+						"value",
+						(snapshot) => {
+							snapshot.forEach((project) => {
+								setProjects((projects) => [
+									...projects,
+									project.val().project_id,
+								]);
+							});
+						},
+						(error) => {
+							console.log("Error: " + error.code);
+						}
+					);
 			}
-		);
+		});
 	}, []);
 
 	return (
